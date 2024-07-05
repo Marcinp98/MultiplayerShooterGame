@@ -4,12 +4,14 @@ Intermediate
 Saved
 Build
 **/Geometry
-**/Mannequin
+**/Mannequins
 **/ThirdPerson
 **/ThirdPersonBP
 **/LearningKit_Games
 **/MilitaryWeapSilver
 **/AnimStarterPack
+**/LevelPrototyping
+**/LearningKit_Robots
 .vscode
 .vs
 *.VC.db
