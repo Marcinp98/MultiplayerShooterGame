@@ -15,12 +15,20 @@ class SHOOTERGAME_API UOverHeadWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* DisplayText;
+	class UTextBlock* NetworkRoleText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PlayerNameText;
 	
-	void SetDisplayText(FString TextToDisplay);
+	void SetNetworkRoleText(FString TextToDisplay);
 
 	UFUNCTION(BlueprintCallable)
 	void ShowPlayerNetRole(APawn* InPawn);
+
+	void SetPlayerNameText(FString PlayerName);
+
+	UFUNCTION(BlueprintCallable)
+	void ShowPlayerName(APawn* InPawn);
 
 protected:
 	virtual void NativeDestruct() override;
