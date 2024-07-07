@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "OverHeadWidget.h"
+#include "OverheadWidget.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
 
-void UOverHeadWidget::SetNetworkRoleText(FString TextToDisplay)
+void UOverheadWidget::SetNetworkRoleText(FString TextToDisplay)
 {
 	if (NetworkRoleText)
 	{
@@ -13,7 +13,7 @@ void UOverHeadWidget::SetNetworkRoleText(FString TextToDisplay)
 	}
 }
 
-void UOverHeadWidget::ShowPlayerNetRole(APawn* InPawn)
+void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 {
 	ENetRole RemoteRole = InPawn->GetRemoteRole();
 	FString Role;
@@ -37,7 +37,7 @@ void UOverHeadWidget::ShowPlayerNetRole(APawn* InPawn)
 	SetNetworkRoleText(RemoteRoleString);
 }
 
-void UOverHeadWidget::SetPlayerNameText(FString PlayerName)
+void UOverheadWidget::SetPlayerNameText(FString PlayerName)
 {
 	if (PlayerNameText)
 	{
@@ -45,7 +45,7 @@ void UOverHeadWidget::SetPlayerNameText(FString PlayerName)
 	}
 }
 
-void UOverHeadWidget::ShowPlayerName(APawn* InPawn)
+void UOverheadWidget::ShowPlayerName(APawn* InPawn)
 {
 	APlayerState* PlayerState = InPawn->GetPlayerState();
 	FString Name;
@@ -57,7 +57,7 @@ void UOverHeadWidget::ShowPlayerName(APawn* InPawn)
 	}
 }
 
-void UOverHeadWidget::NativeDestruct()
+void UOverheadWidget::NativeDestruct()
 {
 	RemoveFromParent();
 	Super::NativeDestruct();

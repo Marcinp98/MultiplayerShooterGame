@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "OverHeadWidget.generated.h"
+#include "OverheadWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SHOOTERGAME_API UOverHeadWidget : public UUserWidget
+class SHOOTERGAME_API UOverheadWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
