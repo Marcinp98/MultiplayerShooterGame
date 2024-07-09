@@ -11,6 +11,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "ShooterGame/Weapon/Weapon.h"
+#include "ShooterGame/ShooterComponents/CombatComponent.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -30,6 +31,9 @@ AShooterCharacter::AShooterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true);
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -38,6 +42,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(AShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
+
 
 void AShooterCharacter::BeginPlay()
 {
@@ -56,6 +61,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
 
 void AShooterCharacter::Move(const FInputActionValue& Value)
 {
@@ -81,9 +87,23 @@ void AShooterCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AShooterCharacter::EquipButtonPressed(const FInputActionValue& Value)
+{
+	if (Combat && HasAuthority())
+	{
+		Combat->EquippedWeapon(OverlappingWeapon);
+	}
+}
+
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+
 	OverlappingWeapon = Weapon;
+	
 	if (IsLocallyControlled())
 	{
 		if (OverlappingWeapon)
@@ -114,7 +134,19 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Jump);
+		EnhancedInputComponent->BindAction(EquipButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::EquipButtonPressed);
 	}
+}
+
+
+void AShooterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
+	
 }
 
 
