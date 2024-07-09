@@ -5,6 +5,7 @@
 #include <Components/SphereComponent.h>
 #include <Components/WidgetComponent.h>
 #include <ShooterGame/Character/ShooterCharacter.h>
+#include "Net/UnrealNetwork.h"
 
 AWeapon::AWeapon()
 {
@@ -50,6 +51,13 @@ void AWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AWeapon, WeaponState);
+}
+
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
@@ -65,6 +73,29 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlapComponent, AActor* 
 	if (ShooterCharacter)
 	{
 		ShooterCharacter->SetOverlappingWeapon(nullptr);
+	}
+}
+
+void AWeapon::SetWeaponState(EWeaponState State)
+{
+	WeaponState = State;
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	}
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
 	}
 }
 

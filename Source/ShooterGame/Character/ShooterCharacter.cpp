@@ -89,9 +89,24 @@ void AShooterCharacter::Look(const FInputActionValue& Value)
 
 void AShooterCharacter::EquipButtonPressed(const FInputActionValue& Value)
 {
-	if (Combat && HasAuthority())
+	if (Combat)
 	{
-		Combat->EquippedWeapon(OverlappingWeapon);
+		if (HasAuthority())
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+	}
+}
+
+void AShooterCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (Combat)
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
 
