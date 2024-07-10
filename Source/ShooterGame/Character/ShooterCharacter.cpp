@@ -34,6 +34,8 @@ AShooterCharacter::AShooterCharacter()
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -102,6 +104,32 @@ void AShooterCharacter::EquipButtonPressed(const FInputActionValue& Value)
 	}
 }
 
+void AShooterCharacter::CrouchButtonPressed(const FInputActionValue& Value)
+{
+	Crouch();
+}
+
+void AShooterCharacter::CrouchButtonReleased(const FInputActionValue& Value)
+{
+	UnCrouch();
+}
+
+void AShooterCharacter::AimButtonPressed(const FInputActionValue& Value)
+{
+	if (Combat)
+	{
+		Combat->SetAiming(true);
+	}
+}
+
+void AShooterCharacter::AimButtonReleased(const FInputActionValue& Value)
+{
+	if (Combat)
+	{
+		Combat->SetAiming(false);
+	}
+}
+
 void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if (Combat)
@@ -128,6 +156,8 @@ void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 }
 
+
+
 void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	if (OverlappingWeapon)
@@ -140,6 +170,17 @@ void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 	}
 }
 
+bool AShooterCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
+bool AShooterCharacter::IsAiming()
+{
+	return (Combat && Combat->bAiming);
+}
+
+
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -150,6 +191,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Jump);
 		EnhancedInputComponent->BindAction(EquipButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::EquipButtonPressed);
+		EnhancedInputComponent->BindAction(CrouchButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::CrouchButtonPressed);
+		EnhancedInputComponent->BindAction(CrouchButtonPressedAction, ETriggerEvent::Completed, this, &AShooterCharacter::CrouchButtonReleased);
+		EnhancedInputComponent->BindAction(AimButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimButtonPressed);
+		EnhancedInputComponent->BindAction(AimButtonPressedAction, ETriggerEvent::Completed, this, &AShooterCharacter::AimButtonReleased);
 	}
 }
 
