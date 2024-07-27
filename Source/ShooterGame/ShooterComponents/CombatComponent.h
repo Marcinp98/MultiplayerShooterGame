@@ -31,6 +31,13 @@ protected:
 	void OnRep_EquippedWeapon();
 
 	void FireButtonPressed(bool bPressed);
+
+	UFUNCTION(Server, Reliable)
+	void ServerFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire();
+
 private:
 	class AShooterCharacter* Character;
 
