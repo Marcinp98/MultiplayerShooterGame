@@ -14,6 +14,7 @@
 #include "ShooterGame/ShooterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "ShooterCharacterAnimInstance.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -139,6 +140,22 @@ void AShooterCharacter::AimButtonReleased(const FInputActionValue& Value)
 	if (Combat)
 	{
 		Combat->SetAiming(false);
+	}
+}
+
+void AShooterCharacter::FireButtonPressed(const FInputActionValue& Value)
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(true);
+	}
+}
+
+void AShooterCharacter::FireButtonReleased(const FInputActionValue& Value)
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(false);
 	}
 }
 
@@ -285,6 +302,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(CrouchButtonPressedAction, ETriggerEvent::Completed, this, &AShooterCharacter::CrouchButtonReleased);
 		EnhancedInputComponent->BindAction(AimButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimButtonPressed);
 		EnhancedInputComponent->BindAction(AimButtonPressedAction, ETriggerEvent::Completed, this, &AShooterCharacter::AimButtonReleased);
+		EnhancedInputComponent->BindAction(FireButtonPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireButtonPressedAction, ETriggerEvent::Completed, this, &AShooterCharacter::FireButtonReleased);
 	}
 }
 
@@ -297,6 +316,20 @@ void AShooterCharacter::PostInitializeComponents()
 		Combat->Character = this;
 	}
 	
+}
+
+void AShooterCharacter::PlayFireMontage(bool bAiming)
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && FireWeaponMontage)
+	{
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
 }
 
 
