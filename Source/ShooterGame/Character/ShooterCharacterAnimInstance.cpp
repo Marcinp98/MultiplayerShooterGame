@@ -36,6 +36,7 @@ void UShooterCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = ShooterCharacter->bIsCrouched;
 	bAiming = ShooterCharacter->IsAiming();
 	TurningInPlace = ShooterCharacter->GetTurningInPlace();
+	bRotateRootBone = ShooterCharacter->ShouldRotateRootBone();
 
 	// Offset Yaw for Strafing
 	FRotator AimRotation = ShooterCharacter->GetBaseAimRotation();
