@@ -16,6 +16,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ShooterCharacterAnimInstance.h"
 #include "ShooterGame/ShooterGame.h"
+#include "ShooterGame/PlayerController/ShooterPlayerController.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -57,6 +58,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(AShooterCharacter, Health);
 }
 
 
@@ -70,6 +72,12 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -335,6 +343,11 @@ void AShooterCharacter::HideCameraIfCharacterClose()
 			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
+}
+
+void AShooterCharacter::OnRep_Health()
+{
+
 }
 
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
