@@ -16,8 +16,7 @@ class SHOOTERGAME_API UCharacterOverlay : public UUserWidget
 public:
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* 
-		Bar;
+	class UProgressBar* HealthBar;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* HealthText;
