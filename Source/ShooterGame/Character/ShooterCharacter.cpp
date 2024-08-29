@@ -73,11 +73,13 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-	if (ShooterPlayerController)
+	UpdateHUDHealth();
+
+	if (HasAuthority())
 	{
-		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+		OnTakeAnyDamage.AddDynamic(this, &AShooterCharacter::ReceiveDamage);
 	}
+
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -319,11 +321,6 @@ void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 	}
 }
 
-void AShooterCharacter::MultiCastHit_Implementation()
-{
-	PlayHitReactMontage();
-}
-
 void AShooterCharacter::HideCameraIfCharacterClose()
 {
 	if (!IsLocallyControlled()) return;
@@ -347,8 +344,19 @@ void AShooterCharacter::HideCameraIfCharacterClose()
 
 void AShooterCharacter::OnRep_Health()
 {
-
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
+
+void AShooterCharacter::UpdateHUDHealth()
+{
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
 
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
@@ -462,5 +470,11 @@ void AShooterCharacter::PlayHitReactMontage()
 	}
 }
 
+void AShooterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
+{
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
 
 
