@@ -26,9 +26,10 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
+	void Elim();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Elim();
+	void MulticastElim();
 protected:
 	virtual void BeginPlay() override;
 
@@ -143,6 +144,13 @@ private:
 	class AShooterPlayerController* ShooterPlayerController;
 
 	bool bElimmed = false;
+
+	FTimerHandle ElimTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay = 3.f;
+
+	void ElimTimerFinished();
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);

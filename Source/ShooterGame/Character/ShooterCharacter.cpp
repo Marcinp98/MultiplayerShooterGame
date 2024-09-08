@@ -18,11 +18,12 @@
 #include "ShooterGame/ShooterGame.h"
 #include "ShooterGame/PlayerController/ShooterPlayerController.h"
 #include "ShooterGame/GameMode/ShooterGameGameMode.h"
+#include "TimerManager.h"
 
 AShooterCharacter::AShooterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 600.f;
@@ -70,10 +71,30 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication = 0.f;
 }
 
-void AShooterCharacter::Elim_Implementation()
+void AShooterCharacter::Elim()
+{
+	MulticastElim();
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&AShooterCharacter::ElimTimerFinished,
+		ElimDelay
+	);
+}
+
+void AShooterCharacter::MulticastElim_Implementation()
 {
 	bElimmed = true;
 	PlayElimMontage();
+}
+
+void AShooterCharacter::ElimTimerFinished()
+{
+	AShooterGameGameMode* ShooterGameGameMode = GetWorld()->GetAuthGameMode<AShooterGameGameMode>();
+	if (ShooterGameGameMode)
+	{
+		ShooterGameGameMode->RequestRespawn(this, Controller);
+	}
 }
 
 void AShooterCharacter::BeginPlay()
@@ -363,7 +384,6 @@ void AShooterCharacter::UpdateHUDHealth()
 		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
 	}
 }
-
 
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
