@@ -70,9 +70,10 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication = 0.f;
 }
 
-void AShooterCharacter::Elim()
+void AShooterCharacter::Elim_Implementation()
 {
-	
+	bElimmed = true;
+	PlayElimMontage();
 }
 
 void AShooterCharacter::BeginPlay()
@@ -460,6 +461,15 @@ void AShooterCharacter::PlayFireMontage(bool bAiming)
 		FName SectionName;
 		SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
 		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void AShooterCharacter::PlayElimMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && ElimMontage)
+	{
+		AnimInstance->Montage_Play(ElimMontage);
 	}
 }
 
